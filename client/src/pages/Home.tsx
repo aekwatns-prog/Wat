@@ -16,8 +16,15 @@ export default function Home() {
     <div className="min-h-screen">
       <Navigation />
 
-      {/* Hero Section */}
-      <section className="section-spacing border-b border-border/30">
+      {/* Hero Section with Background Image */}
+      <section className="section-spacing border-b border-border/30 relative overflow-hidden">
+        <div className="absolute inset-0 -z-10">
+          <img
+            src="/hero-cover.jpg"
+            alt="Hero Background"
+            className="w-full h-full object-cover opacity-40"
+          />
+        </div>
         <div className="container">
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <h1 className="font-display text-5xl md:text-7xl font-bold leading-tight text-balance">

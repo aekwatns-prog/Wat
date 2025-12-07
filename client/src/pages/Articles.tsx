@@ -6,6 +6,18 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 
+const categoryImageMap: Record<string, string> = {
+  "วิทยาศาสตร์และเทคโนโลยี": "/category-science.jpg",
+  "การเมือง": "/category-politics.jpg",
+  "หุ้นและการลงทุน": "/category-business.jpg",
+  "เศรษฐกิจ": "/category-economy.jpg",
+  "ท่องเที่ยว": "/category-travel.jpg",
+  "เพลง": "/category-music.jpg",
+  "ภาพยนตร์": "/category-film.jpg",
+  "ดนตรี": "/category-music.jpg",
+  "อาหาร": "/category-food.jpg",
+};
+
 export default function Articles() {
   const [selectedCategory, setSelectedCategory] = useState<number | undefined>();
   const [searchQuery, setSearchQuery] = useState("");
@@ -17,6 +29,9 @@ export default function Articles() {
     search: searchQuery,
     limit: 50,
   });
+
+  const selectedCategoryName = categories?.find(c => c.id === selectedCategory)?.name;
+  const backgroundImage = selectedCategoryName ? categoryImageMap[selectedCategoryName] : "/hero-cover.jpg";
 
   const handleSearch = () => {
     setSearchQuery(searchInput);
@@ -32,7 +47,14 @@ export default function Articles() {
     <div className="min-h-screen">
       <Navigation />
 
-      <div className="section-spacing">
+      <div className="section-spacing relative overflow-hidden">
+        <div className="absolute inset-0 -z-10">
+          <img
+            src={backgroundImage}
+            alt="Category Background"
+            className="w-full h-full object-cover opacity-30"
+          />
+        </div>
         <div className="container">
           {/* Header */}
           <div className="mb-16 text-center">

@@ -121,3 +121,10 @@
 - [x] Push โค้ดไปยัง GitHub
 - [x] ตั้งค่า GitHub Secrets และแก้ไข GitHub Actions workflow
 - [x] GitHub Actions กำลังสร้าง APK (In progress)
+
+## Bug Fix: GitHub Actions APK Build ล้มเหลว
+- [ ] ลบ workflow ที่ใช้ Gradle
+- [ ] สร้าง workflow ใหม่ที่ใช้ Capacitor CLI
+- [ ] ตั้งค่า Node.js และ Capacitor ใน GitHub Actions
+- [ ] Push ไปยัง GitHub
+- [ ] ทดสอบ GitHub Actions workflow ใหม่

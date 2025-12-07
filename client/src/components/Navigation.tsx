@@ -31,7 +31,7 @@ export default function Navigation() {
           <Link href="/">
             <a className="flex items-center space-x-2 group">
               <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight hover:text-accent transition-colors">
-                CHRONICLE
+                My Article
               </h1>
             </a>
           </Link>

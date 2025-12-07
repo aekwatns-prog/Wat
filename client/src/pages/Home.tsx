@@ -130,7 +130,7 @@ export default function Home() {
       <footer className="border-t border-border/30 py-12">
         <div className="container">
           <div className="text-center">
-            <h3 className="font-display text-2xl font-bold mb-2">CHRONICLE</h3>
+            <h3 className="font-display text-2xl font-bold mb-2">My Article</h3>
             <p className="text-sm text-muted-foreground font-sans">
               แพลตฟอร์มบล็อกสำหรับผู้สร้างสรรค์เนื้อหาคุณภาพ
             </p>

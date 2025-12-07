@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { TrendingUp, TrendingDown, Loader2 } from "lucide-react";
 
 interface Stock {
   symbol: string;
@@ -9,37 +9,85 @@ interface Stock {
 }
 
 export default function StockTicker() {
-  const [stocks, setStocks] = useState<Stock[]>([
-    { symbol: "TSLA", price: 245.67, change: 5.23, changePercent: 2.18 },
-    { symbol: "AAPL", price: 189.45, change: -2.15, changePercent: -1.12 },
-    { symbol: "AMD", price: 156.78, change: 8.92, changePercent: 6.03 },
-    { symbol: "GOOG", price: 142.89, change: 3.45, changePercent: 2.47 },
-    { symbol: "META", price: 498.23, change: -12.34, changePercent: -2.42 },
-    { symbol: "MSFT", price: 378.91, change: 6.78, changePercent: 1.82 },
-  ]);
+  const [stocks, setStocks] = useState<Stock[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const symbols = ["TSLA", "AAPL", "AMD", "GOOG", "META", "MSFT"];
+  const apiKey = import.meta.env.VITE_ALPHA_VANTAGE_API_KEY;
+
+  const fetchStockData = async () => {
+    try {
+      setError(null);
+      const stockData: Stock[] = [];
+
+      for (const symbol of symbols) {
+        const response = await fetch(
+          `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${apiKey}`
+        );
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch ${symbol}`);
+        }
+
+        const data = await response.json();
+
+        if (data["Global Quote"] && data["Global Quote"]["05. price"]) {
+          const quote = data["Global Quote"];
+          const price = parseFloat(quote["05. price"]);
+          const change = parseFloat(quote["09. change"]);
+          const changePercent = parseFloat(quote["10. change percent"]);
+
+          stockData.push({
+            symbol,
+            price,
+            change,
+            changePercent,
+          });
+        }
+      }
+
+      setStocks(stockData);
+      setLoading(false);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to fetch stock data"
+      );
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // Simulate price updates every 5 seconds
-    const interval = setInterval(() => {
-      setStocks((prevStocks) =>
-        prevStocks.map((stock) => {
-          const randomChange = (Math.random() - 0.5) * 10;
-          const newPrice = Math.max(stock.price + randomChange, 1);
-          const change = newPrice - stock.price;
-          const changePercent = (change / stock.price) * 100;
+    fetchStockData();
 
-          return {
-            ...stock,
-            price: parseFloat(newPrice.toFixed(2)),
-            change: parseFloat(change.toFixed(2)),
-            changePercent: parseFloat(changePercent.toFixed(2)),
-          };
-        })
-      );
-    }, 5000);
+    // Refresh data every 60 seconds (Alpha Vantage free tier has rate limits)
+    const interval = setInterval(fetchStockData, 60000);
 
     return () => clearInterval(interval);
   }, []);
+
+  if (loading) {
+    return (
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-border/30 rounded-lg p-6 mb-8 flex items-center justify-center min-h-[200px]">
+        <Loader2 className="animate-spin text-foreground mr-2" />
+        <span className="text-foreground">กำลังโหลดข้อมูลราคาหุ้น...</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-lg p-6 mb-8">
+        <p className="text-red-600">เกิดข้อผิดพลาด: {error}</p>
+        <button
+          onClick={fetchStockData}
+          className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+        >
+          ลองใหม่
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-border/30 rounded-lg p-6 mb-8">
@@ -94,7 +142,7 @@ export default function StockTicker() {
       </div>
 
       <p className="text-xs text-muted-foreground mt-4 text-center">
-        * ข้อมูลราคาหุ้นนี้เป็นข้อมูลจำลองเพื่อการสาธิต
+        * ข้อมูลราคาหุ้นจากแหล่ง Alpha Vantage (อัปเดตทุก 60 วินาที)
       </p>
     </div>
   );

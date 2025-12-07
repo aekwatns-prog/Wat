@@ -67,3 +67,9 @@
 - [x] เปลี่ยนชื่อเว็บไซต์ใน Home page
 - [x] เปลี่ยนชื่อเว็บไซต์ใน Footer
 - [x] อัปเดต environment variable VITE_APP_TITLE
+
+## New Feature: ฟังก์ชั่อ่านว่างให้ฟัง
+- [x] ติดตั้ง text-to-speech library
+- [x] สร้าง AudioPlayer component
+- [x] เพิ่ม audio player ในหน้า ArticleDetail
+- [x] ทดสอบฟังก์ชั่อ่านว่างฟัง

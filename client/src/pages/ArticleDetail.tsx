@@ -1,13 +1,13 @@
-import { useRoute } from "wouter";
 import { trpc } from "@/lib/trpc";
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Calendar, User as UserIcon, Eye, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
 import { th } from "date-fns/locale";
-import { Link } from "wouter";
+import { Link, useRoute } from "wouter";
 import { Streamdown } from "streamdown";
 import CommentSection from "@/components/CommentSection";
+import AudioPlayer from "@/components/AudioPlayer";
 
 export default function ArticleDetail() {
   const [, params] = useRoute("/article/:slug");
@@ -125,6 +125,11 @@ export default function ArticleDetail() {
               </p>
             </div>
           )}
+
+          {/* Audio Player */}
+          <div className="mb-12">
+            <AudioPlayer text={article.content} title={article.title} />
+          </div>
 
           {/* Content */}
           <div className="article-content mb-16">

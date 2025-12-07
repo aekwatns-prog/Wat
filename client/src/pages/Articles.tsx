@@ -5,6 +5,7 @@ import ArticleCard from "@/components/ArticleCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
+import StockTicker from "@/components/StockTicker";
 
 const categoryImageMap: Record<string, string> = {
   "วิทยาศาสตร์และเทคโนโลยี": "/category-science-v2.jpg",
@@ -32,6 +33,7 @@ export default function Articles() {
 
   const selectedCategoryName = categories?.find(c => c.id === selectedCategory)?.name;
   const backgroundImage = selectedCategoryName ? categoryImageMap[selectedCategoryName] : "/hero-cover-v2.jpg";
+  const isStockCategory = selectedCategoryName === "หุ้นและการลงทุน";
 
   const handleSearch = () => {
     setSearchQuery(searchInput);
@@ -106,6 +108,9 @@ export default function Articles() {
               </div>
             )}
           </div>
+
+          {/* Stock Ticker for Investment Category */}
+          {isStockCategory && <StockTicker />}
 
           {/* Articles Grid */}
           {isLoading ? (

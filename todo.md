@@ -117,6 +117,7 @@
 - [x] เพิ่ม Like button ในหน้า ArticleDetail
 - [x] สร้าง Related Articles component
 - [x] เพิ่ม Related Articles ในหน้า ArticleDetail
-- [ ] เติม GitHub repository URL
-- [ ] Push โค้ดไปยัง GitHub
-- [ ] ทดสอบ GitHub Actions workflow
+- [x] เติม GitHub repository URL: https://github.com/aekwatns-prog/Wat
+- [x] Push โค้ดไปยัง GitHub
+- [x] ตั้งค่า GitHub Secrets และแก้ไข GitHub Actions workflow
+- [x] GitHub Actions กำลังสร้าง APK (In progress)

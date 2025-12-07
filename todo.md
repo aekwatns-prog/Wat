@@ -98,3 +98,15 @@
 - [x] สร้าง NASANews component ที่ดึงข้อมูลจาก NASA API
 - [x] เพิ่ม NASANews ในหน้า Articles เมื่อเลือกหมวดหมู่วิทยาศาสตร์และเทคโนโลยี
 - [x] ทดสอบการแสดงผลข่าวอวกาศ
+
+## New Feature: สร้าง APK Application
+- [ ] ติดตั้ง Capacitor สำหรับแปลงเว็บเป็นแอป
+- [ ] ตั้งค่า Android project
+- [ ] สร้าง APK ไฟล์
+- [ ] ทดสอบ APK บน Android emulator
+
+## Update: สร้าง GitHub Actions Workflow
+- [x] สร้าง GitHub Actions workflow สำหรับการสร้าง APK
+- [x] ตั้งค่า keystore และ signing config
+- [x] สร้าง BUILD_APK.md guide
+- [x] อัปเดต capacitor.config.ts

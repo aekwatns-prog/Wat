@@ -8,6 +8,8 @@ import { Link, useRoute } from "wouter";
 import { Streamdown } from "streamdown";
 import CommentSection from "@/components/CommentSection";
 import AudioPlayer from "@/components/AudioPlayer";
+import LikeButton from "@/components/LikeButton";
+import RelatedArticles from "@/components/RelatedArticles";
 
 export default function ArticleDetail() {
   const [, params] = useRoute("/article/:slug");
@@ -136,6 +138,11 @@ export default function ArticleDetail() {
             <Streamdown>{article.content}</Streamdown>
           </div>
 
+          {/* Like Button */}
+          <div className="border-t border-border/30 pt-8 mb-8">
+            <LikeButton articleId={article.id} />
+          </div>
+
           {/* Author Info */}
           {article.author && (
             <div className="border-t border-border/30 pt-8">
@@ -152,6 +159,13 @@ export default function ArticleDetail() {
           )}
         </div>
       </article>
+
+      {/* Related Articles */}
+      <section className="section-spacing border-t border-border/30">
+        <div className="container max-w-4xl">
+          <RelatedArticles articleId={article.id} limit={3} />
+        </div>
+      </section>
 
       {/* Comments Section */}
       <section className="border-t border-border/30 py-16">

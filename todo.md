@@ -110,3 +110,13 @@
 - [x] ตั้งค่า keystore และ signing config
 - [x] สร้าง BUILD_APK.md guide
 - [x] อัปเดต capacitor.config.ts
+
+## Phase 8: เพิ่มระบบ Like/Favorite, Related Articles และ GitHub
+- [x] เพิ่มตาราง likes ในฐานข้อมูล
+- [x] สร้าง Like/Favorite component
+- [x] เพิ่ม Like button ในหน้า ArticleDetail
+- [x] สร้าง Related Articles component
+- [x] เพิ่ม Related Articles ในหน้า ArticleDetail
+- [ ] เติม GitHub repository URL
+- [ ] Push โค้ดไปยัง GitHub
+- [ ] ทดสอบ GitHub Actions workflow

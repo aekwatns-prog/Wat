@@ -257,6 +257,37 @@ export const appRouter = router({
         return { url };
       }),
   }),
+
+  // ========== Likes ==========
+  likes: router({
+    toggle: protectedProcedure
+      .input(z.object({ articleId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        const liked = await db.toggleArticleLike(input.articleId, ctx.user.id);
+        return { liked };
+      }),
+
+    getCount: publicProcedure
+      .input(z.object({ articleId: z.number() }))
+      .query(async ({ input }) => {
+        const count = await db.getArticleLikeCount(input.articleId);
+        return { count };
+      }),
+
+    getUserLiked: protectedProcedure.query(async ({ ctx }) => {
+      const likedArticleIds = await db.getUserLikedArticles(ctx.user.id);
+      return { likedArticleIds };
+    }),
+  }),
+
+  // ========== Related Articles ==========
+  related: router({
+    getByArticleId: publicProcedure
+      .input(z.object({ articleId: z.number(), limit: z.number().default(5) }))
+      .query(async ({ input }) => {
+        return await db.getRelatedArticles(input.articleId, input.limit);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

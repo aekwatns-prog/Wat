@@ -1,6 +1,6 @@
 import { eq, desc, and, like, or, sql, isNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, categories, InsertCategory, articles, InsertArticle, comments, InsertComment, articleViews, InsertArticleView } from "../drizzle/schema";
+import { InsertUser, users, categories, InsertCategory, articles, InsertArticle, comments, InsertComment, articleViews, InsertArticleView, likes, InsertLike } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -359,6 +359,91 @@ export async function getPopularArticles(limit = 10) {
     .leftJoin(categories, eq(articles.categoryId, categories.id))
     .where(eq(articles.status, "published"))
     .orderBy(desc(articles.viewCount))
+    .limit(limit);
+
+  return result.map((row) => ({
+    ...row.article,
+    author: row.author,
+    category: row.category,
+  }));
+}
+
+// ========== Likes ==========
+
+export async function toggleArticleLike(articleId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const existingLike = await db
+    .select()
+    .from(likes)
+    .where(and(eq(likes.articleId, articleId), eq(likes.userId, userId)))
+    .limit(1);
+
+  if (existingLike.length > 0) {
+    await db
+      .delete(likes)
+      .where(and(eq(likes.articleId, articleId), eq(likes.userId, userId)));
+    return false;
+  } else {
+    await db.insert(likes).values({ articleId, userId });
+    return true;
+  }
+}
+
+export async function getArticleLikeCount(articleId: number) {
+  const db = await getDb();
+  if (!db) return 0;
+
+  const result = await db
+    .select({ count: sql`COUNT(*)` })
+    .from(likes)
+    .where(eq(likes.articleId, articleId));
+
+  return Number(result[0]?.count) || 0;
+}
+
+export async function getUserLikedArticles(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const result = await db
+    .select({ articleId: likes.articleId })
+    .from(likes)
+    .where(eq(likes.userId, userId));
+
+  return result.map((row) => row.articleId);
+}
+
+export async function getRelatedArticles(articleId: number, limit = 5) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const article = await db
+    .select({ categoryId: articles.categoryId })
+    .from(articles)
+    .where(eq(articles.id, articleId))
+    .limit(1);
+
+  if (!article[0]?.categoryId) return [];
+
+  const result = await db
+    .select({
+      article: articles,
+      author: users,
+      category: categories,
+    })
+    .from(articles)
+    .leftJoin(users, eq(articles.authorId, users.id))
+    .leftJoin(categories, eq(articles.categoryId, categories.id))
+    .where(
+      and(
+        eq(articles.categoryId, article[0].categoryId),
+        sql`${articles.id} != ${articleId}`,
+        eq(articles.status, "published")
+      )
+    )
+    .orderBy(desc(articles.publishedAt))
     .limit(limit);
 
   return result.map((row) => ({

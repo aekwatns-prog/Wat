@@ -91,3 +91,16 @@ export const articleViews = mysqlTable("articleViews", {
 
 export type ArticleView = typeof articleViews.$inferSelect;
 export type InsertArticleView = typeof articleViews.$inferInsert;
+
+/**
+ * Likes table for user article likes
+ */
+export const likes = mysqlTable("likes", {
+  id: int("id").autoincrement().primaryKey(),
+  articleId: int("articleId").notNull(),
+  userId: int("userId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Like = typeof likes.$inferSelect;
+export type InsertLike = typeof likes.$inferInsert;

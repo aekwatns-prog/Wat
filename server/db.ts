@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { eq, desc, and, like, or, sql, isNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, categories, InsertCategory, articles, InsertArticle, comments, InsertComment, articleViews, InsertArticleView } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -35,7 +35,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     };
     const updateSet: Record<string, unknown> = {};
 
-    const textFields = ["name", "email", "loginMethod"] as const;
+    const textFields = ["name", "email", "loginMethod", "bio", "avatarUrl"] as const;
     type TextField = (typeof textFields)[number];
 
     const assignNullable = (field: TextField) => {
@@ -89,4 +89,281 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+export async function getUserById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function updateUserProfile(userId: number, data: { name?: string; bio?: string; avatarUrl?: string }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(users).set(data).where(eq(users.id, userId));
+}
+
+// ========== Categories ==========
+
+export async function getAllCategories() {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(categories).orderBy(categories.name);
+}
+
+export async function getCategoryById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(categories).where(eq(categories.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getCategoryBySlug(slug: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(categories).where(eq(categories.slug, slug)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createCategory(data: InsertCategory) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(categories).values(data);
+  return Number(result[0].insertId);
+}
+
+// ========== Articles ==========
+
+export async function createArticle(data: InsertArticle) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(articles).values(data);
+  return Number(result[0].insertId);
+}
+
+export async function getArticleById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db
+    .select({
+      article: articles,
+      author: users,
+      category: categories,
+    })
+    .from(articles)
+    .leftJoin(users, eq(articles.authorId, users.id))
+    .leftJoin(categories, eq(articles.categoryId, categories.id))
+    .where(eq(articles.id, id))
+    .limit(1);
+
+  if (result.length === 0) return undefined;
+
+  return {
+    ...result[0].article,
+    author: result[0].author,
+    category: result[0].category,
+  };
+}
+
+export async function getArticleBySlug(slug: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db
+    .select({
+      article: articles,
+      author: users,
+      category: categories,
+    })
+    .from(articles)
+    .leftJoin(users, eq(articles.authorId, users.id))
+    .leftJoin(categories, eq(articles.categoryId, categories.id))
+    .where(eq(articles.slug, slug))
+    .limit(1);
+
+  if (result.length === 0) return undefined;
+
+  return {
+    ...result[0].article,
+    author: result[0].author,
+    category: result[0].category,
+  };
+}
+
+export async function getPublishedArticles(params?: {
+  categoryId?: number;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { categoryId, search, limit = 20, offset = 0 } = params || {};
+
+  let query = db
+    .select({
+      article: articles,
+      author: users,
+      category: categories,
+    })
+    .from(articles)
+    .leftJoin(users, eq(articles.authorId, users.id))
+    .leftJoin(categories, eq(articles.categoryId, categories.id))
+    .where(eq(articles.status, "published"))
+    .$dynamic();
+
+  if (categoryId) {
+    query = query.where(eq(articles.categoryId, categoryId));
+  }
+
+  if (search) {
+    query = query.where(
+      or(
+        like(articles.title, `%${search}%`),
+        like(articles.excerpt, `%${search}%`)
+      )
+    );
+  }
+
+  const result = await query
+    .orderBy(desc(articles.publishedAt))
+    .limit(limit)
+    .offset(offset);
+
+  return result.map((row) => ({
+    ...row.article,
+    author: row.author,
+    category: row.category,
+  }));
+}
+
+export async function getArticlesByAuthor(authorId: number, includesDrafts = false) {
+  const db = await getDb();
+  if (!db) return [];
+
+  let query = db
+    .select({
+      article: articles,
+      author: users,
+      category: categories,
+    })
+    .from(articles)
+    .leftJoin(users, eq(articles.authorId, users.id))
+    .leftJoin(categories, eq(articles.categoryId, categories.id))
+    .where(eq(articles.authorId, authorId))
+    .$dynamic();
+
+  if (!includesDrafts) {
+    query = query.where(eq(articles.status, "published"));
+  }
+
+  const result = await query.orderBy(desc(articles.createdAt));
+
+  return result.map((row) => ({
+    ...row.article,
+    author: row.author,
+    category: row.category,
+  }));
+}
+
+export async function updateArticle(id: number, data: Partial<InsertArticle>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(articles).set(data).where(eq(articles.id, id));
+}
+
+export async function deleteArticle(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.delete(articles).where(eq(articles.id, id));
+}
+
+export async function incrementArticleViews(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(articles)
+    .set({ viewCount: sql`${articles.viewCount} + 1` })
+    .where(eq(articles.id, id));
+}
+
+// ========== Comments ==========
+
+export async function createComment(data: InsertComment) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(comments).values(data);
+  return Number(result[0].insertId);
+}
+
+export async function getCommentsByArticleId(articleId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const result = await db
+    .select({
+      comment: comments,
+      author: users,
+    })
+    .from(comments)
+    .leftJoin(users, eq(comments.authorId, users.id))
+    .where(eq(comments.articleId, articleId))
+    .orderBy(desc(comments.createdAt));
+
+  return result.map((row) => ({
+    ...row.comment,
+    author: row.author,
+  }));
+}
+
+export async function deleteComment(id: number, authorId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.delete(comments).where(and(eq(comments.id, id), eq(comments.authorId, authorId)));
+}
+
+// ========== Article Views ==========
+
+export async function trackArticleView(data: InsertArticleView) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.insert(articleViews).values(data);
+}
+
+export async function getPopularArticles(limit = 10) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const result = await db
+    .select({
+      article: articles,
+      author: users,
+      category: categories,
+    })
+    .from(articles)
+    .leftJoin(users, eq(articles.authorId, users.id))
+    .leftJoin(categories, eq(articles.categoryId, categories.id))
+    .where(eq(articles.status, "published"))
+    .orderBy(desc(articles.viewCount))
+    .limit(limit);
+
+  return result.map((row) => ({
+    ...row.article,
+    author: row.author,
+    category: row.category,
+  }));
+}

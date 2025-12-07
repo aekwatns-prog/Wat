@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -43,39 +44,40 @@
 }
 
 :root {
-  --primary: var(--color-blue-700);
-  --primary-foreground: var(--color-blue-50);
-  --sidebar-primary: var(--color-blue-600);
-  --sidebar-primary-foreground: var(--color-blue-50);
-  --chart-1: var(--color-blue-300);
-  --chart-2: var(--color-blue-500);
-  --chart-3: var(--color-blue-600);
-  --chart-4: var(--color-blue-700);
-  --chart-5: var(--color-blue-800);
-  --radius: 0.65rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.235 0.015 65);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.235 0.015 65);
+  /* Magazine high-end color palette - Cream & Dark Charcoal */
+  --radius: 0.25rem;
+  --background: oklch(0.96 0.01 70); /* Soft cream background */
+  --foreground: oklch(0.25 0.01 240); /* Dark charcoal text */
+  --card: oklch(1 0 0); /* Pure white cards */
+  --card-foreground: oklch(0.25 0.01 240);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.235 0.015 65);
-  --secondary: oklch(0.98 0.001 286.375);
-  --secondary-foreground: oklch(0.4 0.015 65);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.967 0.001 286.375);
-  --accent-foreground: oklch(0.141 0.005 285.823);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.623 0.214 259.815);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.235 0.015 65);
-  --sidebar-accent: oklch(0.967 0.001 286.375);
-  --sidebar-accent-foreground: oklch(0.141 0.005 285.823);
-  --sidebar-border: oklch(0.92 0.004 286.32);
-  --sidebar-ring: oklch(0.623 0.214 259.815);
+  --popover-foreground: oklch(0.25 0.01 240);
+  --primary: oklch(0.25 0.01 240); /* Dark charcoal for primary actions */
+  --primary-foreground: oklch(0.96 0.01 70);
+  --secondary: oklch(0.92 0.008 70); /* Lighter cream for secondary */
+  --secondary-foreground: oklch(0.25 0.01 240);
+  --muted: oklch(0.94 0.008 70);
+  --muted-foreground: oklch(0.5 0.005 240);
+  --accent: oklch(0.6 0.18 40); /* Warm terracotta accent */
+  --accent-foreground: oklch(1 0 0);
+  --destructive: oklch(0.65 0.25 25);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.88 0.005 240);
+  --input: oklch(0.88 0.005 240);
+  --ring: oklch(0.25 0.01 240);
+  --sidebar-primary: oklch(0.25 0.01 240);
+  --sidebar-primary-foreground: oklch(0.96 0.01 70);
+  --sidebar: oklch(0.98 0.005 70);
+  --sidebar-foreground: oklch(0.25 0.01 240);
+  --sidebar-accent: oklch(0.94 0.008 70);
+  --sidebar-accent-foreground: oklch(0.25 0.01 240);
+  --sidebar-border: oklch(0.88 0.005 240);
+  --sidebar-ring: oklch(0.25 0.01 240);
+  --chart-1: oklch(0.6 0.18 40);
+  --chart-2: oklch(0.5 0.15 50);
+  --chart-3: oklch(0.4 0.12 60);
+  --chart-4: oklch(0.3 0.1 70);
+  --chart-5: oklch(0.25 0.08 80);
 }
 
 .dark {
@@ -119,6 +121,7 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
@@ -130,6 +133,28 @@
   input[type="checkbox"]:not(:disabled),
   input[type="radio"]:not(:disabled) {
     @apply cursor-pointer;
+  }
+  
+  /* Typography hierarchy for magazine style */
+  h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  
+  h4, h5, h6 {
+    font-family: 'Lora', serif;
+    font-weight: 600;
+  }
+  
+  body, p, span, div {
+    font-family: 'Lora', serif;
+    font-weight: 400;
+  }
+  
+  /* Sans-serif for UI elements and labels */
+  button, input, select, textarea, .ui-text {
+    font-family: 'Inter', sans-serif;
   }
 }
 
@@ -171,7 +196,82 @@
     .container {
       padding-left: 2rem; /* 32px - desktop padding */
       padding-right: 2rem;
-      max-width: 1280px; /* Standard content width */
+      max-width: 1400px; /* Magazine-style wider content */
     }
+  }
+}
+
+@layer utilities {
+  /* Magazine-specific utilities */
+  .font-display {
+    font-family: 'Playfair Display', serif;
+  }
+  
+  .font-serif {
+    font-family: 'Lora', serif;
+  }
+  
+  .font-sans {
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  /* Geometric divider lines */
+  .divider-line {
+    @apply border-t border-border/30;
+  }
+  
+  /* Elegant spacing */
+  .section-spacing {
+    @apply py-16 md:py-24 lg:py-32;
+  }
+  
+  .content-spacing {
+    @apply space-y-6 md:space-y-8;
+  }
+  
+  /* Small caps for labels */
+  .label-caps {
+    @apply font-sans text-xs font-medium tracking-wider uppercase;
+  }
+  
+  /* Article content styling */
+  .article-content {
+    @apply max-w-none text-lg leading-relaxed;
+  }
+  
+  .article-content > * + * {
+    @apply mt-6;
+  }
+  
+  .article-content h1,
+  .article-content h2,
+  .article-content h3 {
+    font-family: 'Playfair Display', serif;
+  }
+  
+  .article-content p {
+    @apply leading-relaxed text-foreground/90;
+  }
+  
+  .article-content a {
+    @apply text-accent underline decoration-1 underline-offset-2 hover:decoration-2 transition-all;
+  }
+  
+  /* Magazine-style image treatments */
+  .magazine-image {
+    @apply relative overflow-hidden;
+  }
+  
+  .magazine-image img {
+    @apply w-full h-full object-cover transition-transform duration-700 hover:scale-105;
+  }
+  
+  /* Elegant card hover effects */
+  .elegant-card {
+    @apply transition-all duration-300 hover:shadow-lg;
   }
 }

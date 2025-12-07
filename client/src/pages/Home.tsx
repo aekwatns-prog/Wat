@@ -20,7 +20,7 @@ export default function Home() {
       <section className="section-spacing border-b border-border/30 relative overflow-hidden">
         <div className="absolute inset-0 -z-10">
           <img
-            src="/hero-cover.jpg"
+            src="/hero-cover-v2.jpg"
             alt="Hero Background"
             className="w-full h-full object-cover opacity-40"
           />

@@ -7,15 +7,15 @@ import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 
 const categoryImageMap: Record<string, string> = {
-  "วิทยาศาสตร์และเทคโนโลยี": "/category-science.jpg",
-  "การเมือง": "/category-politics.jpg",
-  "หุ้นและการลงทุน": "/category-business.jpg",
-  "เศรษฐกิจ": "/category-economy.jpg",
-  "ท่องเที่ยว": "/category-travel.jpg",
-  "เพลง": "/category-music.jpg",
-  "ภาพยนตร์": "/category-film.jpg",
-  "ดนตรี": "/category-music.jpg",
-  "อาหาร": "/category-food.jpg",
+  "วิทยาศาสตร์และเทคโนโลยี": "/category-science-v2.jpg",
+  "การเมือง": "/category-politics-v2.jpg",
+  "หุ้นและการลงทุน": "/category-business-v2.jpg",
+  "เศรษฐกิจ": "/category-economy-v2.jpg",
+  "ท่องเที่ยว": "/category-travel-v2.jpg",
+  "เพลง": "/category-music-v2.jpg",
+  "ภาพยนตร์": "/category-film-v2.jpg",
+  "ดนตรี": "/category-music-v2.jpg",
+  "อาหาร": "/category-food-v2.jpg",
 };
 
 export default function Articles() {
@@ -31,7 +31,7 @@ export default function Articles() {
   });
 
   const selectedCategoryName = categories?.find(c => c.id === selectedCategory)?.name;
-  const backgroundImage = selectedCategoryName ? categoryImageMap[selectedCategoryName] : "/hero-cover.jpg";
+  const backgroundImage = selectedCategoryName ? categoryImageMap[selectedCategoryName] : "/hero-cover-v2.jpg";
 
   const handleSearch = () => {
     setSearchQuery(searchInput);
